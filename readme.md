@@ -7,11 +7,13 @@ PENJELASAN PROGRAM
    - Menyimpan hasil voxelisasi ke file .obj
 
 REQUIREMENT
-- C++23
+-  C++  >20
+- glibc >2.34 (opsional)
 
 CARA COMPILE
 cd src
 g++ -std=c++23 -o tucil 1.cpp 
+g++ -std=c++23 -o tucil 1.cpp -pthread (jika tidak memliki versi glibc >2.34)
 
 Saran Variable kedalaman maksimum
 - Akibat dari pembagian kubus yang menghasilkan maksimum 8^maxdepth anakan kubus, disarankan kedalaman maksimum lebih kecil dari 7
