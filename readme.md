@@ -11,14 +11,14 @@ REQUIREMENT
 
 CARA COMPILE
 cd src
-g++ -std=c++23 -o tucil 1.cpp -lpthread
+g++ -std=c++23 -o tucil 1.cpp 
 
 Saran Variable kedalaman maksimum
 - Akibat dari pembagian kubus yang menghasilkan maksimum 8^maxdepth anakan kubus, disarankan kedalaman maksimum lebih kecil dari 7
 - Pada kedalaman 10 line.obj yang hanya berisi 3 vertices dan 1 face menghasilkan file sebesar 1.40 GB
 
 CARA MENJALANKAN
-1 cd src
+1 cd bin
 2 ./tucil
 3 Pilih aksi:
    - "1. Voxelisasi" Memulai proses voxelisasi
@@ -30,8 +30,11 @@ CARA MENJALANKAN
 
 Identitas
 Nama  : Ahmad Fauzan Putra
+
 NIM   : 13524141
+
 Kelas : K3
+
 
 
 1
