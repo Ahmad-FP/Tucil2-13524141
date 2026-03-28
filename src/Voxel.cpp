@@ -12,6 +12,7 @@
 #include <queue>
 #include <iomanip>
 #include <cmath>
+#include <filesystem>
 
 using namespace std;
 
@@ -371,7 +372,15 @@ void createFaces(vector<vec3>& coords){
     cfFlag.unlock();
 }
 //TODO voxelize
+int cntt = 0;
+int progressbar = 1000;
 void voxelize(cube parent, vector<tri*> tr,int depth){
+    if (cntt % progressbar == 0)
+    {
+        cout << "PROCESSING" << endl;
+    }
+    cntt++;
+    
     if(depth != maxDepth){
         // vec3 center;                                     //abandoned feature
         // center.arr[0] = (parent.maxX +parent.minX)/2;
@@ -456,7 +465,7 @@ void loop(){
         voxelize(t.first,t.second.first,t.second.second);
         activeCount--;
         if(activeCount == 0 && tQueCount == 0){
-            // cout << "SHUTDOWN CALL\n";
+            cout << "SHUTDOWN CALL\n";
             shutdown =true;
             shutdown.notify_all();
             tQueCount = 2;
@@ -486,6 +495,7 @@ void resetvar(){
     activeCount = 0;
     antiDupFace.clear();
     antiDupPoint.clear();
+    cntt = 0;
 }
 
 int main(){
@@ -494,7 +504,7 @@ int main(){
         cout <<"Pilih aksi yang ingin dilakukan\n";
         cout << "1. Voxelisasi\n";
         cout << "2. Save\n";
-        cout << "3. Reset Variabel\n";
+        cout << "3. Reset Variabel (lakukan jika tidak melakukan save)\n";
         cout << "4. Exit\n";
         cin >> choice;
         if(choice == 1)
@@ -504,6 +514,8 @@ int main(){
             cin >>maxDepth;
             cout << "Masukkan nama file .obj yang ingin di voxelisasi (contoh: pumpkin.obj)\n";
             cin >>name;
+            cout << "Masukkan frekuensi concurrency check ( semakin tinggi semakin jarang (disarankan: 10000))\n";
+            cin >> progressbar;
             auto start = chrono::steady_clock::now();
             read(name);
             dInfo.assign(maxDepth+1,{0,0});
@@ -528,14 +540,13 @@ int main(){
             {
                 tr.push_back(&face[i]);
             }
-            
+            enque(c1,tr,0);
             vector<thread> threads;
             for (int i = 0; i < 8; i++)
             {
                 threads.emplace_back(loop);
             }
             dInfo[0].first++;
-            enque(c1,tr,0);
             shutdown.wait(false);
             
             for(auto& t : threads){
@@ -593,6 +604,7 @@ int main(){
             cout << "Masukkan nama file yang ingin di simpan (contoh: pumpkin.obj)\n";
             cin >> name;
             save(name);
+            cout << "File disimpan di: " << filesystem::absolute(name) << "\n";
             resetvar();
         }else if (choice == 3)
         {

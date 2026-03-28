@@ -38,24 +38,3 @@ NIM   : 13524141
 Kelas : K3
 
 
-
-1
-5
-cow.obj
-2
-../test/voxelCow.obj
-1
-5
-line.obj
-2
-../test/voxelLine.obj
-1
-5
-pumpkin.obj
-2
-../test/voxelPumpkin.obj
-1
-5
-teapot.obj
-2
-../test/voxelTeapot.obj
