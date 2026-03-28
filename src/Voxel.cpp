@@ -11,11 +11,13 @@
 #include <algorithm>
 #include <queue>
 #include <iomanip>
-
+#include <cmath>
+#include <filesystem>
 
 using namespace std;
 
 #define pb push_back
+
 
 struct vec3{
     double arr[3];
@@ -31,13 +33,20 @@ struct tri{
         return arr[0] == a.arr[0] && arr[1] == a.arr[1] && arr[2] == a.arr[2] && normal == a.normal; 
     }
 };
+
+vec3 roundT5(vec3 v){
+    v.arr[0] = round(v.arr[0] * 1e5) / 1e5;
+    v.arr[1] = round(v.arr[1] * 1e5) / 1e5;
+    v.arr[2] = round(v.arr[2] * 1e5) / 1e5;
+    return v;
+}
 namespace std {
     template <>
     struct hash<vec3> {
         size_t operator()(const vec3& v) const {
             size_t h = 0;
             for (int i = 0; i < 3; ++i) {
-                h ^= std::hash<double>{}(v.arr[i]) + 0x9e3779b9 + (h << 6) + (h >> 2);
+                h ^= hash<double>{}(v.arr[i]) + 0x9e3779b9 + (h << 6) + (h >> 2);
             }
             return h;
         }
@@ -47,9 +56,9 @@ namespace std {
         size_t operator()(const tri& t) const {
             size_t h = 0;
             for (int i = 0; i < 3; ++i) {
-                h ^= std::hash<int>{}(t.arr[i]) + 0x9e3779b9 + (h << 6) + (h >> 2);
+                h ^= hash<int>{}(t.arr[i]) + 0x9e3779b9 + (h << 6) + (h >> 2);
             }
-            h ^= std::hash<vec3>{}(t.normal);
+            h ^= hash<vec3>{}(t.normal);
             return h;
         }
     };
@@ -363,7 +372,15 @@ void createFaces(vector<vec3>& coords){
     cfFlag.unlock();
 }
 //TODO voxelize
+int cntt = 0;
+int progressbar = 1000;
 void voxelize(cube parent, vector<tri*> tr,int depth){
+    if (cntt % progressbar == 0)
+    {
+        cout << "PROCESSING" << endl;
+    }
+    cntt++;
+    
     if(depth != maxDepth){
         // vec3 center;                                     //abandoned feature
         // center.arr[0] = (parent.maxX +parent.minX)/2;
@@ -416,6 +433,7 @@ void voxelize(cube parent, vector<tri*> tr,int depth){
         
     }else{
         vector<vec3> cords = static_cast<vector<vec3>&&> (calcPoints(parent));
+        for (int i = 0; i < 8; i++) cords[i] = roundT5(cords[i]);
         cpFlag.lock();
         for (int i = 0; i < 8; i++)
         {
@@ -447,7 +465,7 @@ void loop(){
         voxelize(t.first,t.second.first,t.second.second);
         activeCount--;
         if(activeCount == 0 && tQueCount == 0){
-            // cout << "SHUTDOWN CALL\n";
+            cout << "SHUTDOWN CALL\n";
             shutdown =true;
             shutdown.notify_all();
             tQueCount = 2;
@@ -477,6 +495,7 @@ void resetvar(){
     activeCount = 0;
     antiDupFace.clear();
     antiDupPoint.clear();
+    cntt = 0;
 }
 
 int main(){
@@ -485,7 +504,7 @@ int main(){
         cout <<"Pilih aksi yang ingin dilakukan\n";
         cout << "1. Voxelisasi\n";
         cout << "2. Save\n";
-        cout << "3. Reset Variabel\n";
+        cout << "3. Reset Variabel (lakukan jika tidak melakukan save)\n";
         cout << "4. Exit\n";
         cin >> choice;
         if(choice == 1)
@@ -495,6 +514,8 @@ int main(){
             cin >>maxDepth;
             cout << "Masukkan nama file .obj yang ingin di voxelisasi (contoh: pumpkin.obj)\n";
             cin >>name;
+            cout << "Masukkan frekuensi concurrency check ( semakin tinggi semakin jarang (disarankan: 10000))\n";
+            cin >> progressbar;
             auto start = chrono::steady_clock::now();
             read(name);
             dInfo.assign(maxDepth+1,{0,0});
@@ -519,14 +540,13 @@ int main(){
             {
                 tr.push_back(&face[i]);
             }
-            
+            enque(c1,tr,0);
             vector<thread> threads;
             for (int i = 0; i < 8; i++)
             {
                 threads.emplace_back(loop);
             }
             dInfo[0].first++;
-            enque(c1,tr,0);
             shutdown.wait(false);
             
             for(auto& t : threads){
@@ -584,6 +604,7 @@ int main(){
             cout << "Masukkan nama file yang ingin di simpan (contoh: pumpkin.obj)\n";
             cin >> name;
             save(name);
+            cout << "File disimpan di: " << filesystem::absolute(name) << "\n";
             resetvar();
         }else if (choice == 3)
         {

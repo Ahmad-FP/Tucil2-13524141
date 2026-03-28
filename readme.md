@@ -12,8 +12,8 @@ REQUIREMENT
 
 CARA COMPILE
 cd src
-g++ -std=c++23 -o tucil 1.cpp 
-g++ -std=c++23 -o tucil 1.cpp -pthread (jika tidak memliki versi glibc >2.34)
+g++ -std=c++23 -o tucil Voxel.cpp 
+g++ -std=c++23 -o tucil Voxel.cpp -pthread (jika tidak memliki versi glibc >2.34)
 
 Saran Variable kedalaman maksimum
 - Akibat dari pembagian kubus yang menghasilkan maksimum 8^maxdepth anakan kubus, disarankan kedalaman maksimum lebih kecil dari 7
@@ -38,24 +38,3 @@ NIM   : 13524141
 Kelas : K3
 
 
-
-1
-5
-cow.obj
-2
-../test/voxelCow.obj
-1
-5
-line.obj
-2
-../test/voxelLine.obj
-1
-5
-pumpkin.obj
-2
-../test/voxelPumpkin.obj
-1
-5
-teapot.obj
-2
-../test/voxelTeapot.obj
